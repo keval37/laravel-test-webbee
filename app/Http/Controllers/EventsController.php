@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -11,16 +12,22 @@ use Illuminate\Support\Facades\Date;
 
 class EventsController extends BaseController
 {
+
+
+    public function testWarmupEvents()
+    {
+        $events = Event::all();
+        return response()->json($events);
+    }
+
     /*
      Requirements:
     - maximum 2 sql queries
     - verify your solution with `php artisan test`
     - do a `git commit && git push` after you are done or when the time limit is over
-
     Hints:
     - open the `app/Http/Controllers/EventsController` file
     - partial or not working answers also get graded so make sure you commit what you have
-
     Sample response on GET /events:
     ```json
     [
@@ -96,8 +103,10 @@ class EventsController extends BaseController
     ]
      */
 
-    public function getEventsWithWorkshops() {
-        throw new \Exception('implement in coding task 1');
+    public function getEventsWithWorkshops()
+    {
+        $events = Event::with('workshops')->get();
+        return response()->json($events);
     }
 
 
@@ -109,13 +118,11 @@ class EventsController extends BaseController
     - all filtering of records should happen in the database
     - verify your solution with `php artisan test`
     - do a `git commit && git push` after you are done or when the time limit is over
-
     Hints:
     - open the `app/Http/Controllers/EventsController` file
     - partial or not working answers also get graded so make sure you commit what you have
     - join, whereIn, min, groupBy, havingRaw might be helpful
     - in the sample data set  the event with id 1 is already in the past and should therefore be excluded
-
     Sample response on GET /futureevents:
     ```json
     [
@@ -175,7 +182,11 @@ class EventsController extends BaseController
     ```
      */
 
-    public function getFutureEventsWithWorkshops() {
-        throw new \Exception('implement in coding task 2');
+    public function getFutureEventsWithWorkshops()
+    {
+        $events = Event::with('workshops')->whereHas('workshops', function ($q) {
+            $q->where('start', '>=', Carbon::parse('2021-08-20')); // we can use Carbon::now() for live project
+        })->get();
+        return response()->json($events);
     }
 }

@@ -14,14 +14,11 @@ class MenuController extends BaseController
     - it should work for infinite level of depth (children of childrens children of childrens children, ...)
     - verify your solution with `php artisan test`
     - do a `git commit && git push` after you are done or when the time limit is over
-
     Hints:
     - open the `app/Http/Controllers/MenuController` file
     - eager loading cannot load deeply nested relationships
     - a recursive function in php is needed to structure the query results
     - partial or not working answers also get graded so make sure you commit what you have
-
-
     Sample response on GET /menu:
     ```json
     [
@@ -94,7 +91,9 @@ class MenuController extends BaseController
     ]
      */
 
-    public function getMenuItems() {
-        throw new \Exception('implement in coding task 3');
+    public function getMenuItems()
+    {
+        $menu_items = MenuItem::with('children')->whereNull('parent_id')->get();
+        return response()->json($menu_items);
     }
 }
